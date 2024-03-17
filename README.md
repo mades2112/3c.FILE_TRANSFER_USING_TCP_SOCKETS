@@ -11,34 +11,59 @@ To write a python program for creating File Transfer using TCP Sockets Links
 CLIENT:
 ```
 import socket 
-s=socket.socket() 
-s.connect(('localhost',8000)) 
-while True: 
-   msg=input("Client > ") 
-   s.send(msg.encode()) 
-   print("Server > ",s.recv(1024).decode())
+s = socket.socket() 
+host = socket.gethostname() 
+port = 60000 
+s.connect((host, port)) 
+s.send("Hello server!".encode()) 
+with open('received_file', 'wb') as f: 
+   while True: 
+       print('receiving data...') 
+       data = s.recv(1024) 
+       print('data=%s', (data)) 
+       if not data: 
+           break 
+       f.write(data) 
+f.close() 
+print('Successfully get the file') 
+s.close() 
+print('connection closed')
 ```
 SERVER:
 ```
-import socket 
-s=socket.socket() 
-s.bind(('localhost',8000)) 
-s.listen(5) 
-c,addr=s.accept() 
+ 
+import socket                    
+port = 60000                    
+s = socket.socket()              
+host = socket.gethostname()      
+s.bind((host, port))              
+s.listen(5)                      
 while True: 
-    ClientMessage=c.recv(1024).decode() 
-    c.send(ClientMessage.encode()) 
-
+    conn, addr = s.accept()      
+    data = conn.recv(1024) 
+    print('Server received', repr(data)) 
+    filename='mytext.txt' 
+    f = open(filename,'rb') 
+    l = f.read(1024) 
+    while (l): 
+       conn.send(l) 
+       print('Sent ',repr(l)) 
+       l = f.read(1024) 
+    f.close() 
+    print('Done sending') 
+    conn.send('Thank you for connecting'.encode()) 
+    conn.close()
 ```
 ## OUTPUT
 CLIENT:
 
-![Uploading 313486071-30ff104d-40e6-45a6-8b6c-225ed5948653.png…]()
+![313487863-35e3403c-606d-46ce-8ec7-2df647c5bcaf](https://github.com/mades2112/3c.FILE_TRANSFER_USING_TCP_SOCKETS/assets/152461996/ae08c1ff-a22a-4163-b5e7-8dea585763f6)
+
 
 
 SERVER:
+![313487843-73455105-dd71-4140-9349-cc7b87decfb0](https://github.com/mades2112/3c.FILE_TRANSFER_USING_TCP_SOCKETS/assets/152461996/f63e7201-4819-414f-82ad-d27ddaa14235)
 
-![313486054-f9990833-595a-48ce-9674-6b3ed0c7ae95](https://github.com/mades2112/3c.FILE_TRANSFER_USING_TCP_SOCKETS/assets/152461996/7850c618-64c9-4d60-ae83-03d178c6ffd2)
 
 ## RESULT
 Thus, the python program for creating File Transfer using TCP Sockets Links was 
